@@ -15,6 +15,7 @@
     --yellow-deep:#E3B65C;
     --lavender:#8C7FCB;
     --lavender-deep:#6C5CA8;
+    --lavender-soft:#C9C0E8;
     --coral:#E8837D;
     --coral-deep:#D5645C;
     --green:#4B7952;
@@ -35,17 +36,36 @@
       var(--cream);
     color:var(--ink);
     font-family:'Quicksand', sans-serif;
+    overflow-x:hidden;
   }
 
   body{
     display:flex;
     flex-direction:column;
     align-items:center;
+    min-height:100vh;
+  }
+
+  /* ---------- Scene management ---------- */
+  .scene{
+    display:none;
+    width:100%;
+    flex-direction:column;
+    align-items:center;
     padding:48px 20px 80px;
+    min-height:100vh;
+    justify-content:center;
+  }
+  .scene.active{
+    display:flex;
+    animation: sceneIn .6s ease;
+  }
+  @keyframes sceneIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
   }
 
   .eyebrow{
-    font-family:'Quicksand', sans-serif;
     font-weight:600;
     letter-spacing:0.22em;
     text-transform:uppercase;
@@ -54,16 +74,17 @@
     margin-bottom:10px;
   }
 
-  h1{
+  h1, h2{
     font-family:'Fraunces', serif;
     font-style:italic;
     font-weight:500;
-    font-size:clamp(2.1rem, 6vw, 3.4rem);
     margin:0 0 10px;
     text-align:center;
     color:var(--ink);
-    line-height:1.05;
+    line-height:1.15;
   }
+  h1{ font-size:clamp(2.1rem, 6vw, 3.4rem); }
+  h2{ font-size:clamp(1.7rem, 5vw, 2.5rem); }
 
   .subtitle{
     max-width:420px;
@@ -71,12 +92,197 @@
     color:var(--ink-soft);
     font-size:15px;
     line-height:1.5;
-    margin:0 0 34px;
+    margin:0 0 30px;
   }
-
   .subtitle strong{ color:var(--ink); font-weight:600; }
 
-  /* ---------- Progress dots ---------- */
+  .btn{
+    border:none;
+    background:var(--lavender);
+    color:#fff;
+    font-family:'Quicksand', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    padding:13px 30px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .2s ease, background .2s ease, opacity .2s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
+  .btn.coral{ background:var(--coral); }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    font-weight:500;
+    padding:8px 10px;
+  }
+  .btn[disabled]{ opacity:.55; cursor:default; }
+  .btn.hidden-btn{ opacity:0; pointer-events:none; transform:translateY(6px); }
+  .btn.show-btn{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
+  .skip-link{
+    position:fixed;
+    top:16px;
+    right:18px;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    text-decoration:underline;
+    cursor:pointer;
+    opacity:.7;
+    z-index:60;
+  }
+
+  .music-btn{
+    position:fixed;
+    top:14px;
+    left:16px;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:1.5px solid rgba(140,127,203,0.35);
+    background:var(--paper);
+    color:var(--lavender-deep);
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(62,54,44,0.25);
+    z-index:60;
+    transition:transform .2s ease, background .2s ease;
+  }
+  .music-btn:hover{ transform:scale(1.06); }
+  .music-btn:focus-visible{ outline:3px solid var(--lavender-deep); outline-offset:2px; }
+  .music-btn.playing{ background:var(--lavender-soft); }
+
+  /* ================= SCENE 1: INTRO ================= */
+  #scene-intro{ cursor:pointer; }
+  .intro-box{
+    max-width:480px;
+    text-align:center;
+    min-height:160px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .intro-line{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.5rem, 5.5vw, 2.3rem);
+    line-height:1.3;
+    color:var(--ink);
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .intro-line.show{ opacity:1; transform:translateY(0); }
+  .intro-line.final{ color:var(--coral-deep); }
+
+  .intro-dots{
+    display:flex;
+    gap:8px;
+    margin-top:34px;
+  }
+  .intro-dots span{
+    width:7px; height:7px; border-radius:50%;
+    background:rgba(140,127,203,0.3);
+    transition:background .3s ease, transform .3s ease;
+  }
+  .intro-dots span.on{ background:var(--lavender); transform:scale(1.3); }
+
+  .intro-hint{
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    opacity:.75;
+  }
+
+  /* ================= SCENE 2: CAKE ================= */
+  .cake-wrap{
+    position:relative;
+    width:100%;
+    max-width:360px;
+    margin:6px 0 22px;
+  }
+  .cake-wrap svg{ width:100%; height:auto; display:block; }
+
+  .flame{
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: flicker 1.6s ease-in-out infinite;
+    transition: opacity .3s ease;
+  }
+  .flame:nth-child(2){ animation-delay:.2s; }
+  @keyframes flicker{
+    0%,100%{ transform:scale(1) rotate(0deg); }
+    30%{ transform:scale(1.06,0.95) rotate(-3deg); }
+    60%{ transform:scale(0.95,1.06) rotate(3deg); }
+  }
+  @keyframes blowOut{
+    0%{ transform:scale(1) rotate(0deg) translateX(0); opacity:1; }
+    25%{ transform:scale(1.35,0.55) rotate(22deg) translateX(5px); opacity:.85; }
+    55%{ transform:scale(0.55,1.3) rotate(-16deg) translateX(-4px); opacity:.4; }
+    100%{ transform:scale(0.15) rotate(8deg) translateX(2px); opacity:0; }
+  }
+  .candle-group.out .flame{
+    animation: blowOut .5s ease forwards;
+  }
+  .smoke{
+    opacity:0;
+    transform:translateY(0) scale(.6);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+  .candle-group.out .smoke{
+    animation: smokeUp 1.4s ease forwards;
+    animation-delay:.35s;
+  }
+  @keyframes smokeUp{
+    0%{ opacity:.55; transform:translateY(0) scale(.6); }
+    100%{ opacity:0; transform:translateY(-26px) scale(1.3); }
+  }
+
+  .mic-status{
+    min-height:22px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:6px 0 4px;
+    text-align:center;
+  }
+  .mic-status.success{ color:var(--coral-deep); }
+
+  .meter{
+    width:220px;
+    max-width:70vw;
+    height:10px;
+    border-radius:999px;
+    background:rgba(140,127,203,0.18);
+    overflow:hidden;
+    margin:4px 0 20px;
+    display:none;
+  }
+  .meter.show{ display:block; }
+  .meter-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--lavender), var(--coral));
+    transition:width .08s linear;
+  }
+
+  .cake-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+
+  /* ================= SCENE 4: BOUQUET (existing) ================= */
   .progress{
     display:flex;
     gap:10px;
@@ -96,14 +302,12 @@
     transform:scale(1.15);
   }
 
-  /* ---------- Bouquet stage ---------- */
   .stage{
     position:relative;
     width:100%;
     max-width:420px;
     aspect-ratio:801/1024;
   }
-
   .stage img{
     width:100%;
     height:100%;
@@ -126,17 +330,6 @@
     border-radius:50%;
     -webkit-tap-highlight-color: transparent;
   }
-
-  .hotspot .ring{
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    box-shadow:0 0 0 2px rgba(255,255,255,0.0);
-  }
-
-  /* "Peephole": a live crop of the same bouquet image, pixel-aligned
-     over the flower, so it can be lifted/scaled to look like the
-     rose leaning forward without disturbing the rest of the artwork */
   .peephole{
     position:absolute;
     inset:0;
@@ -149,7 +342,6 @@
     filter:drop-shadow(0 0 0 rgba(0,0,0,0));
     pointer-events:none;
   }
-
   .hotspot.lifted .peephole{
     transform:translateY(-9%) scale(1.26) rotate(-2deg);
     filter:drop-shadow(0 12px 16px rgba(62,54,44,0.35));
@@ -163,43 +355,26 @@
     opacity:0;
     animation: breathe 2.6s ease-in-out infinite;
   }
-
   .hotspot.white .glow{ background:radial-gradient(circle, rgba(220,215,200,0.55) 0%, rgba(220,215,200,0) 70%); }
   .hotspot.white.opened .glow{ animation:none; opacity:0; }
-
-  .hotspot:focus-visible{
-    outline: 3px solid var(--lavender-deep);
-    outline-offset: 3px;
-  }
-
+  .hotspot:focus-visible{ outline: 3px solid var(--lavender-deep); outline-offset: 3px; }
   @keyframes breathe{
     0%,100%{ opacity:.25; transform:scale(.85); }
     50%{ opacity:.6; transform:scale(1.05); }
   }
-
   .hotspot.white.opened::after{
     content:"✓";
     position:absolute;
-    top:6%;
-    right:6%;
-    width:20px;
-    height:20px;
+    top:6%; right:6%;
+    width:20px; height:20px;
     border-radius:50%;
     background:var(--lavender);
     color:#fff;
-    font-size:11px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    font-size:11px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
     box-shadow:0 3px 8px rgba(108,92,168,0.4);
   }
-
-  /* pink rose special states */
-  .hotspot.pink .glow{
-    background:radial-gradient(circle, rgba(232,131,125,0.0) 0%, rgba(232,131,125,0) 70%);
-    animation:none;
-  }
+  .hotspot.pink .glow{ background:radial-gradient(circle, rgba(232,131,125,0.0) 0%, rgba(232,131,125,0) 70%); animation:none; }
   .hotspot.pink.ready .glow{
     background:radial-gradient(circle, rgba(232,131,125,0.65) 0%, rgba(232,131,125,0) 70%);
     animation: breathe-pink 1.8s ease-in-out infinite;
@@ -222,33 +397,25 @@
     color:var(--ink-soft);
     text-align:center;
     min-height:20px;
-    transition:opacity .3s ease;
   }
   .hint.pink-ready{ color:var(--coral-deep); font-weight:600; }
 
-  /* ---------- Modal ---------- */
   .overlay{
-    position:fixed;
-    inset:0;
+    position:fixed; inset:0;
     background:rgba(62,54,44,0.45);
     backdrop-filter:blur(2px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    display:flex; align-items:center; justify-content:center;
     padding:24px;
-    opacity:0;
-    pointer-events:none;
+    opacity:0; pointer-events:none;
     transition:opacity .35s ease;
-    z-index:50;
+    z-index:80;
   }
   .overlay.show{ opacity:1; pointer-events:auto; }
-
   .card{
     position:relative;
     background:var(--paper);
     border-radius:26px;
-    max-width:400px;
-    width:100%;
+    max-width:400px; width:100%;
     padding:38px 30px 30px;
     box-shadow:var(--shadow);
     transform:translateY(18px) scale(.97);
@@ -257,85 +424,147 @@
     text-align:center;
   }
   .overlay.show .card{ transform:translateY(0) scale(1); opacity:1; }
-
-  .card.pink-card{
-    background: linear-gradient(180deg, #FFF6F2 0%, var(--paper) 55%);
-    border:1px solid rgba(232,131,125,0.25);
-  }
-
+  .card.pink-card{ background: linear-gradient(180deg, #FFF6F2 0%, var(--paper) 55%); border:1px solid rgba(232,131,125,0.25); }
   .card .tag{
-    font-size:11px;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    font-weight:600;
-    color:var(--lavender-deep);
-    margin-bottom:14px;
-    display:block;
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    font-weight:600; color:var(--lavender-deep); margin-bottom:14px; display:block;
   }
   .pink-card .tag{ color:var(--coral-deep); }
-
   .card p.message{
-    font-family:'Fraunces', serif;
-    font-style:italic;
-    font-weight:500;
-    font-size:19px;
-    line-height:1.55;
-    color:var(--ink);
-    margin:0;
-    white-space:pre-line;
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+    font-size:19px; line-height:1.55; color:var(--ink); margin:0; white-space:pre-line;
   }
   .pink-card p.message{ font-size:20px; }
-
   .card .close-btn{
-    margin-top:26px;
-    border:none;
-    background:var(--lavender);
-    color:#fff;
-    font-family:'Quicksand', sans-serif;
-    font-weight:600;
-    font-size:14px;
-    padding:11px 26px;
-    border-radius:999px;
-    cursor:pointer;
+    margin-top:26px; border:none; background:var(--lavender); color:#fff;
+    font-family:'Quicksand', sans-serif; font-weight:600; font-size:14px;
+    padding:11px 26px; border-radius:999px; cursor:pointer;
     transition:transform .2s ease, background .2s ease;
   }
   .card .close-btn:hover{ transform:translateY(-1px); }
   .pink-card .close-btn{ background:var(--coral); }
   .card .close-btn:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
-
   .petal{
-    position:absolute;
-    top:-10px;
-    width:10px;
-    height:14px;
-    background:var(--coral);
-    border-radius:70% 10% 70% 10%;
-    opacity:.85;
-    animation: fall linear forwards;
+    position:absolute; top:-10px; width:10px; height:14px;
+    background:var(--coral); border-radius:70% 10% 70% 10%;
+    opacity:.85; animation: fall linear forwards;
   }
-  @keyframes fall{
-    to{ transform:translateY(420px) rotate(340deg); opacity:0; }
-  }
+  @keyframes fall{ to{ transform:translateY(420px) rotate(340deg); opacity:0; } }
 
-  footer{
-    margin-top:40px;
-    font-size:12px;
-    color:var(--ink-soft);
-    opacity:.7;
-    text-align:center;
-  }
+  footer{ margin-top:40px; font-size:12px; color:var(--ink-soft); opacity:.7; text-align:center; }
 
   @media (prefers-reduced-motion: reduce){
-    .hotspot .glow, .hotspot.pink.ready .glow, .petal{ animation:none !important; }
+    .hotspot .glow, .hotspot.pink.ready .glow, .petal, .flame, .scene.active{ animation:none !important; }
     .card, .overlay, .peephole{ transition:none !important; }
   }
 </style>
 </head>
 <body>
 
+<button class="skip-link" id="skipBtn">Saltar intro →</button>
+<button class="music-btn" id="musicBtn" aria-label="Activar o silenciar música" title="Música">🔇</button>
+<audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
+
+<!-- ===================== SCENE 1: INTRO ===================== -->
+<div class="scene active" id="scene-intro">
+  <div class="intro-box">
+    <p class="intro-line" id="introLine"></p>
+  </div>
+  <div class="intro-dots" id="introDots">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <p class="intro-hint" id="introHint">toca en cualquier lugar para continuar</p>
+  <button class="btn coral hidden-btn" id="introContinueBtn">Continuar</button>
+</div>
+
+<!-- ===================== SCENE 2: CAKE ===================== -->
+<div class="scene" id="scene-cake">
+  <div class="eyebrow">Antes de continuar</div>
+  <h2>Sopla tus velas 🎂</h2>
+  <p class="subtitle">Vamos a activar el micrófono para que soples de verdad. Si prefieres no usarlo, también puedes apagarlas tocando el botón de abajo.</p>
+
+  <div class="cake-wrap">
+    <svg viewBox="0 0 400 340" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="200" cy="308" rx="150" ry="18" fill="#EDE6D6"/>
+      <!-- bottom tier -->
+      <rect x="95" y="205" width="210" height="90" rx="18" fill="#FFFDF9" stroke="#E7DFD0" stroke-width="2"/>
+      <path d="M95,222 C120,205 140,238 165,222 C190,206 210,238 235,222 C260,206 280,238 305,222"
+            fill="none" stroke="#8C7FCB" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="120" cy="255" r="4.5" fill="#8C7FCB"/>
+      <circle cx="150" cy="270" r="4" fill="#C9C0E8"/>
+      <circle cx="255" cy="258" r="4.5" fill="#8C7FCB"/>
+      <circle cx="280" cy="272" r="4" fill="#C9C0E8"/>
+      <!-- top tier -->
+      <rect x="128" y="128" width="144" height="82" rx="16" fill="#FFFDF9" stroke="#E7DFD0" stroke-width="2"/>
+      <path d="M128,145 C148,128 165,158 185,145 C205,130 220,158 240,145 C258,130 258,145 272,145"
+            fill="none" stroke="#8C7FCB" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="150" cy="175" r="3.5" fill="#8C7FCB"/>
+      <circle cx="250" cy="178" r="3.5" fill="#C9C0E8"/>
+      <!-- purple bow -->
+      <g transform="translate(200,205)">
+        <path d="M0,0 C-18,-14 -30,2 -14,10 C-4,15 0,6 0,0 Z" fill="#8C7FCB"/>
+        <path d="M0,0 C18,-14 30,2 14,10 C4,15 0,6 0,0 Z" fill="#8C7FCB"/>
+        <circle cx="0" cy="1" r="5" fill="#6C5CA8"/>
+      </g>
+      <!-- 33 medallion -->
+      <g transform="translate(200,168)">
+        <circle r="26" fill="#FFFDF9" stroke="#8C7FCB" stroke-width="3"/>
+        <text x="0" y="9" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-weight="600" font-size="24" fill="#6C5CA8">33</text>
+      </g>
+      <!-- candles -->
+      <g class="candle-group" id="candle1" transform="translate(140,128)">
+        <rect x="-5" y="-34" width="10" height="34" rx="4" fill="#F3D48A" stroke="#E3B65C" stroke-width="1.5"/>
+        <line x1="0" y1="-34" x2="0" y2="-42" stroke="#7A6F60" stroke-width="2"/>
+        <path class="flame" d="M0,-42 C5.5,-51 5.5,-58 0,-64 C-5.5,-58 -5.5,-51 0,-42 Z" fill="#F2A65A"/>
+        <path class="flame" d="M0,-45 C2.7,-50 2.7,-55 0,-58 C-2.7,-55 -2.7,-50 0,-45 Z" fill="#FBD873" opacity="0.9"/>
+        <ellipse class="smoke" cx="0" cy="-64" rx="4.5" ry="8" fill="#B7AFA0"/>
+      </g>
+      <g class="candle-group" id="candle2" transform="translate(170,124)">
+        <rect x="-5" y="-40" width="10" height="40" rx="4" fill="#F3D48A" stroke="#E3B65C" stroke-width="1.5"/>
+        <line x1="0" y1="-40" x2="0" y2="-48" stroke="#7A6F60" stroke-width="2"/>
+        <path class="flame" d="M0,-48 C5.5,-57 5.5,-64 0,-70 C-5.5,-64 -5.5,-57 0,-48 Z" fill="#F2A65A"/>
+        <path class="flame" d="M0,-51 C2.7,-56 2.7,-61 0,-64 C-2.7,-61 -2.7,-56 0,-51 Z" fill="#FBD873" opacity="0.9"/>
+        <ellipse class="smoke" cx="0" cy="-70" rx="4.5" ry="8" fill="#B7AFA0"/>
+      </g>
+      <g class="candle-group" id="candle3" transform="translate(200,120)">
+        <rect x="-5" y="-36" width="10" height="36" rx="4" fill="#F3D48A" stroke="#E3B65C" stroke-width="1.5"/>
+        <line x1="0" y1="-36" x2="0" y2="-44" stroke="#7A6F60" stroke-width="2"/>
+        <path class="flame" d="M0,-44 C5.5,-53 5.5,-60 0,-66 C-5.5,-60 -5.5,-53 0,-44 Z" fill="#F2A65A"/>
+        <path class="flame" d="M0,-47 C2.7,-52 2.7,-57 0,-60 C-2.7,-57 -2.7,-52 0,-47 Z" fill="#FBD873" opacity="0.9"/>
+        <ellipse class="smoke" cx="0" cy="-66" rx="4.5" ry="8" fill="#B7AFA0"/>
+      </g>
+      <g class="candle-group" id="candle4" transform="translate(230,124)">
+        <rect x="-5" y="-40" width="10" height="40" rx="4" fill="#F3D48A" stroke="#E3B65C" stroke-width="1.5"/>
+        <line x1="0" y1="-40" x2="0" y2="-48" stroke="#7A6F60" stroke-width="2"/>
+        <path class="flame" d="M0,-48 C5.5,-57 5.5,-64 0,-70 C-5.5,-64 -5.5,-57 0,-48 Z" fill="#F2A65A"/>
+        <path class="flame" d="M0,-51 C2.7,-56 2.7,-61 0,-64 C-2.7,-61 -2.7,-56 0,-51 Z" fill="#FBD873" opacity="0.9"/>
+        <ellipse class="smoke" cx="0" cy="-70" rx="4.5" ry="8" fill="#B7AFA0"/>
+      </g>
+      <g class="candle-group" id="candle5" transform="translate(260,128)">
+        <rect x="-5" y="-34" width="10" height="34" rx="4" fill="#F3D48A" stroke="#E3B65C" stroke-width="1.5"/>
+        <line x1="0" y1="-34" x2="0" y2="-42" stroke="#7A6F60" stroke-width="2"/>
+        <path class="flame" d="M0,-42 C5.5,-51 5.5,-58 0,-64 C-5.5,-58 -5.5,-51 0,-42 Z" fill="#F2A65A"/>
+        <path class="flame" d="M0,-45 C2.7,-50 2.7,-55 0,-58 C-2.7,-55 -2.7,-50 0,-45 Z" fill="#FBD873" opacity="0.9"/>
+        <ellipse class="smoke" cx="0" cy="-64" rx="4.5" ry="8" fill="#B7AFA0"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="mic-status" id="micStatus">&nbsp;</p>
+  <div class="meter" id="meter"><div class="meter-fill" id="meterFill"></div></div>
+
+  <div class="cake-actions">
+    <button class="btn" id="micBtn">🎙️ Activar micrófono y soplar</button>
+    <button class="btn ghost" id="fallbackBtn">Prefiero solo tocar para soplar</button>
+    <button class="btn coral hidden-btn" id="cakeContinueBtn">Continuar</button>
+  </div>
+</div>
+
+<!-- ===================== SCENE 4: BOUQUET ===================== -->
+<div class="scene" id="scene-bouquet">
   <div class="eyebrow">Para ti</div>
   <h1>Feliz cumpleaños</h1>
-  <p class="subtitle" id="subtitleText">Este ramo tiene un mensaje escondido en cada flor.<br>Toca una rosa <strong>blanca</strong> para empezar.</p>
+  <p class="subtitle">Este ramo tiene un mensaje escondido en cada flor.<br>Toca una rosa <strong>blanca</strong> para empezar.</p>
 
   <div class="progress" id="progress" aria-hidden="true">
     <span class="dot" data-i="0"></span>
@@ -348,180 +577,355 @@
   <div class="stage" id="stage">
     <img src="bouquet.png" alt="Ramo de flores con rosas blancas, una rosa rosada y lavanda, envuelto en papel amarillo">
 
-    <!-- White rose hotspots -->
     <button class="hotspot white" data-index="0" style="left:46.8%; top:16.5%;" aria-label="Rosa blanca 1">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
     <button class="hotspot white" data-index="1" style="left:34.4%; top:42.6%;" aria-label="Rosa blanca 2">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
     <button class="hotspot white" data-index="2" style="left:47%; top:37.3%;" aria-label="Rosa blanca 3">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
     <button class="hotspot white" data-index="3" style="left:57.6%; top:28.7%;" aria-label="Rosa blanca 4">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
     <button class="hotspot white" data-index="4" style="left:81.4%; top:37.5%;" aria-label="Rosa blanca 5">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
 
-    <!-- Pink rose -->
     <button class="hotspot pink locked" id="pinkBtn" style="left:64.3%; top:40.7%;" aria-label="Rosa rosada, el mensaje especial">
-      <span class="peephole"></span>
-      <span class="glow"></span>
+      <span class="peephole"></span><span class="glow"></span>
     </button>
   </div>
 
   <p class="hint" id="hintText">5 rosas blancas por descubrir</p>
-
   <footer>hecho con cariño 🌿</footer>
+</div>
 
-  <!-- Modal -->
-  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="cardMessage">
-    <div class="card" id="card">
-      <span class="tag" id="cardTag">Rosa blanca</span>
-      <p class="message" id="cardMessage"></p>
-      <button class="close-btn" id="closeBtn">Cerrar</button>
-    </div>
+<!-- Modal (shared by bouquet scene) -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="cardMessage">
+  <div class="card" id="card">
+    <span class="tag" id="cardTag">Rosa blanca</span>
+    <p class="message" id="cardMessage"></p>
+    <button class="close-btn" id="closeBtn">Cerrar</button>
   </div>
+</div>
 
 <script>
-  const whiteMessages = [
-    "Algo que admiro tanto de ti es cómo tratas a las personas con amabilidad y respeto... y cómo te tratas a ti misma igual. Eso no es común, y en ti se nota siempre.",
-    "Cada vez que vamos por el postre de queso en Trujillo se vuelve mi momento favorito cuando te visito. Espero que sigamos yendo muchas veces más.",
-    "Hoy solo quiero pedir una cosa: que vivas feliz toda tu vida. Que cada año que cumplas te encuentre así, brillando como seguramente lo estás haciendo hoy.",
-    "Esta vez sí me pasé de desocupado, jaja. Ya verás por qué cuando te dé mi regalo especial 👀",
-    "Hay algo que le pedí mucho a Dios, y sin decir mucho más... me lo cumplió. Gracias por ser parte de eso."
-  ];
+/* ======================= MUSIC ======================= */
+const bgMusic = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+const TARGET_VOLUME = 0.55;
+let musicStarted = false;
 
-  const pinkMessage = "Eres una persona que me hace querer ser mejor. Y no es solo eso — eres alguien que sé que nunca me voy a arrepentir de seguir conociendo. Me encanta que estés en mi vida y lo especial que la haces con solo estar en ella. Le agradezco a Dios haberme puesto en el camino a alguien que me ha cambiado para bien, y te lo agradezco a ti también.\n\nPor eso no quiero parar de conocerte.\n\nHoy solo te deseo mucha felicidad. Vive llena de bendiciones, porque cada cosa buena que te pase te la mereces por completo — y yo siempre, siempre me voy a alegrar por ti.";
+function fadeInMusic(){
+  bgMusic.volume = 0;
+  bgMusic.play().then(() => {
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.add('playing');
+    let v = 0;
+    const step = setInterval(() => {
+      v += 0.05;
+      if(v >= TARGET_VOLUME){ v = TARGET_VOLUME; clearInterval(step); }
+      bgMusic.volume = v;
+    }, 90);
+  }).catch(() => {
+    // Autoplay blocked: leave the button ready so a manual tap starts it
+    musicBtn.textContent = '🔇';
+  });
+}
 
-  const opened = new Set();
-  const stage = document.getElementById('stage');
-  const allHotspots = document.querySelectorAll('.hotspot');
-  const whiteButtons = document.querySelectorAll('.hotspot.white');
-  const pinkBtn = document.getElementById('pinkBtn');
-  const overlay = document.getElementById('overlay');
-  const card = document.getElementById('card');
-  const cardMessage = document.getElementById('cardMessage');
-  const cardTag = document.getElementById('cardTag');
-  const closeBtn = document.getElementById('closeBtn');
-  const hintText = document.getElementById('hintText');
-  const dots = document.querySelectorAll('.progress .dot');
-  let lastFocused = null;
-  let activeHotspot = null;
+function startMusicOnce(){
+  if(musicStarted) return;
+  musicStarted = true;
+  bgMusic.volume = TARGET_VOLUME;
+  fadeInMusic();
+}
 
-  // Align each "peephole" so it shows exactly the same pixels of the
-  // bouquet photo that sit behind it, so at rest it's invisible, and
-  // when lifted it looks like that same rose leaning forward.
-  function alignPeepholes(){
-    const stageRect = stage.getBoundingClientRect();
-    if(stageRect.width === 0) return;
-    allHotspots.forEach(btn => {
-      const hole = btn.querySelector('.peephole');
-      const btnRect = btn.getBoundingClientRect();
-      const offsetX = btnRect.left - stageRect.left;
-      const offsetY = btnRect.top - stageRect.top;
-      hole.style.backgroundImage = "url('bouquet.png')";
-      hole.style.backgroundSize = stageRect.width + 'px ' + stageRect.height + 'px';
-      hole.style.backgroundPosition = (-offsetX) + 'px ' + (-offsetY) + 'px';
-    });
+musicBtn.addEventListener('click', () => {
+  if(!musicStarted){ startMusicOnce(); return; }
+  if(bgMusic.paused){
+    bgMusic.play();
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.add('playing');
+  } else {
+    bgMusic.pause();
+    musicBtn.textContent = '🔇';
+    musicBtn.classList.remove('playing');
   }
-  window.addEventListener('load', alignPeepholes);
-  window.addEventListener('resize', () => requestAnimationFrame(alignPeepholes));
-  alignPeepholes();
-  setTimeout(alignPeepholes, 300); // safety pass after font/layout settle
+});
 
-  function updateHint(){
-    const remaining = 5 - opened.size;
-    if(remaining > 0){
-      hintText.textContent = remaining === 1
-        ? "1 rosa blanca por descubrir"
-        : `${remaining} rosas blancas por descubrir`;
-      hintText.classList.remove('pink-ready');
-    } else {
-      hintText.textContent = "La rosa rosada está lista para ti ✨";
-      hintText.classList.add('pink-ready');
-    }
+/* ======================= SCENE ROUTER ======================= */
+const scenes = {
+  intro: document.getElementById('scene-intro'),
+  cake: document.getElementById('scene-cake'),
+  bouquet: document.getElementById('scene-bouquet')
+};
+function goTo(name){
+  Object.values(scenes).forEach(s => s.classList.remove('active'));
+  scenes[name].classList.add('active');
+  document.getElementById('skipBtn').style.display = (name === 'intro') ? 'block' : 'none';
+  if(name === 'bouquet'){ setTimeout(alignPeepholes, 60); }
+}
+
+/* ======================= SCENE 1: INTRO ======================= */
+const introLines = [
+  "Hoy cumple años una personita muy especial",
+  "Una persona que ilumina la vida de cualquiera",
+  "Podríamos estar hablando de mi persona favorita",
+  "Feliz cumpleaños, Hilla"
+];
+const introLineEl = document.getElementById('introLine');
+const introDots = document.querySelectorAll('#introDots span');
+const introContinueBtn = document.getElementById('introContinueBtn');
+const introHint = document.getElementById('introHint');
+let introIndex = -1;
+let introTimer = null;
+
+function showIntroLine(i){
+  introLineEl.classList.remove('show');
+  setTimeout(() => {
+    introLineEl.textContent = introLines[i];
+    introLineEl.classList.toggle('final', i === introLines.length - 1);
+    introLineEl.classList.add('show');
+    introDots.forEach((d, di) => d.classList.toggle('on', di === i));
+  }, 220);
+}
+
+function advanceIntro(){
+  if(introIndex >= introLines.length - 1){
+    introContinueBtn.classList.add('show-btn');
+    introHint.style.opacity = '0';
+    return;
   }
-
-  function openCard(message, isPink, btn){
-    lastFocused = document.activeElement;
-    cardMessage.textContent = message;
-    cardTag.textContent = isPink ? "La rosa rosada" : "Rosa blanca";
-    card.classList.toggle('pink-card', isPink);
-    overlay.classList.add('show');
-    closeBtn.focus();
-    if(isPink){ spawnPetals(); }
-
-    activeHotspot = btn;
-    requestAnimationFrame(() => btn.classList.add('lifted'));
+  introIndex++;
+  showIntroLine(introIndex);
+  if(introIndex < introLines.length - 1){
+    introTimer = setTimeout(advanceIntro, 2500);
+  } else {
+    introTimer = setTimeout(() => {
+      introContinueBtn.classList.add('show-btn');
+      introHint.style.opacity = '0';
+    }, 1100);
   }
+}
 
-  function closeCard(){
-    overlay.classList.remove('show');
-    if(activeHotspot){
-      activeHotspot.classList.remove('lifted');
-      activeHotspot = null;
-    }
-    if(lastFocused) lastFocused.focus();
+document.getElementById('scene-intro').addEventListener('click', (e) => {
+  if(e.target === introContinueBtn) return;
+  startMusicOnce();
+  if(introIndex >= introLines.length - 1) return;
+  clearTimeout(introTimer);
+  advanceIntro();
+});
+introContinueBtn.addEventListener('click', (e) => { e.stopPropagation(); startMusicOnce(); goTo('cake'); });
+document.getElementById('skipBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  clearTimeout(introTimer);
+  startMusicOnce();
+  goTo('cake');
+});
+
+advanceIntro();
+
+/* ======================= SCENE 2: CAKE ======================= */
+const micBtn = document.getElementById('micBtn');
+const fallbackBtn = document.getElementById('fallbackBtn');
+const micStatus = document.getElementById('micStatus');
+const meter = document.getElementById('meter');
+const meterFill = document.getElementById('meterFill');
+const cakeContinueBtn = document.getElementById('cakeContinueBtn');
+const candle1 = document.getElementById('candle1');
+const candle2 = document.getElementById('candle2');
+const candle3 = document.getElementById('candle3');
+const candle4 = document.getElementById('candle4');
+const candle5 = document.getElementById('candle5');
+const allCandles = [candle1, candle2, candle3, candle4, candle5];
+
+let audioCtx = null, analyser = null, dataArray = null, listening = false, blowProgress = 0;
+const BLOW_THRESHOLD = 0.14;
+const BLOW_NEEDED = 550;
+
+async function startListening(){
+  micBtn.disabled = true;
+  micStatus.textContent = 'Activando micrófono...';
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+    dataArray = new Uint8Array(analyser.fftSize);
+    listening = true;
+    blowProgress = 0;
+    meter.classList.add('show');
+    micStatus.textContent = 'Escuchando... sopla fuerte 💨';
+    requestAnimationFrame(monitorBlow);
+  } catch(err){
+    micStatus.textContent = 'No pudimos activar el micrófono. Usa el botón de abajo para soplar 🎈';
+    micBtn.disabled = false;
   }
+}
 
-  whiteButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const i = parseInt(btn.dataset.index, 10);
-      if(!opened.has(i)){
-        opened.add(i);
-        btn.classList.add('opened');
-        dots[i].classList.add('filled');
-        updateHint();
-        if(opened.size === 5){
-          pinkBtn.classList.remove('locked');
-          pinkBtn.classList.add('ready');
-        }
+function monitorBlow(){
+  if(!listening) return;
+  analyser.getByteTimeDomainData(dataArray);
+  let sum = 0;
+  for(let i=0;i<dataArray.length;i++){
+    const v = (dataArray[i]-128)/128;
+    sum += v*v;
+  }
+  const rms = Math.sqrt(sum/dataArray.length);
+  meterFill.style.width = Math.min(100, rms*420) + '%';
+
+  if(rms > BLOW_THRESHOLD){ blowProgress += 16; }
+  else { blowProgress = Math.max(0, blowProgress - 10); }
+
+  if(blowProgress >= BLOW_NEEDED){
+    listening = false;
+    stopMic();
+    blowOutCandles();
+    return;
+  }
+  requestAnimationFrame(monitorBlow);
+}
+
+function stopMic(){
+  try{ if(audioCtx) audioCtx.close(); }catch(e){}
+}
+
+function blowOutCandles(){
+  allCandles.forEach((c, i) => setTimeout(() => c.classList.add('out'), i * 70));
+  micStatus.textContent = '¡Las apagaste! 🎉';
+  micStatus.classList.add('success');
+  meter.classList.remove('show');
+  micBtn.style.display = 'none';
+  fallbackBtn.style.display = 'none';
+  cakeContinueBtn.classList.add('show-btn');
+}
+
+micBtn.addEventListener('click', startListening);
+fallbackBtn.addEventListener('click', () => {
+  listening = false;
+  stopMic();
+  blowOutCandles();
+});
+cakeContinueBtn.addEventListener('click', () => goTo('bouquet'));
+
+/* ======================= SCENE 4: BOUQUET ======================= */
+const whiteMessages = [
+  "Algo que admiro tanto de ti es cómo tratas a las personas con amabilidad y respeto... y cómo te tratas a ti misma igual. Eso no es común, y en ti se nota siempre.",
+  "Cada vez que vamos por el postre de queso en Trujillo se vuelve mi momento favorito cuando te visito. Espero que sigamos yendo muchas veces más.",
+  "Hoy solo quiero pedir una cosa: que vivas feliz toda tu vida. Que cada año que cumplas te encuentre así, brillando como seguramente lo estás haciendo hoy.",
+  "Esta vez sí me pasé de desocupado, jaja. Ya verás por qué cuando te dé mi regalo especial 👀",
+  "Hay algo que le pedí mucho a Dios, y sin decir mucho más... me lo cumplió. Gracias por ser parte de eso."
+];
+const pinkMessage = "Eres una persona que me hace querer ser mejor. Y no es solo eso — eres alguien que sé que nunca me voy a arrepentir de seguir conociendo. Me encanta que estés en mi vida y lo especial que la haces con solo estar en ella. Le agradezco a Dios haberme puesto en el camino a alguien que me ha cambiado para bien, y te lo agradezco a ti también.\n\nPor eso no quiero parar de conocerte.\n\nHoy solo te deseo mucha felicidad. Vive llena de bendiciones, porque cada cosa buena que te pase te la mereces por completo — y yo siempre, siempre me voy a alegrar por ti.";
+
+const opened = new Set();
+const stage = document.getElementById('stage');
+const allHotspots = document.querySelectorAll('.hotspot');
+const whiteButtons = document.querySelectorAll('.hotspot.white');
+const pinkBtn = document.getElementById('pinkBtn');
+const overlay = document.getElementById('overlay');
+const card = document.getElementById('card');
+const cardMessage = document.getElementById('cardMessage');
+const cardTag = document.getElementById('cardTag');
+const closeBtn = document.getElementById('closeBtn');
+const hintText = document.getElementById('hintText');
+const dots = document.querySelectorAll('.progress .dot');
+let lastFocused = null;
+let activeHotspot = null;
+
+function alignPeepholes(){
+  const stageRect = stage.getBoundingClientRect();
+  if(stageRect.width === 0) return;
+  allHotspots.forEach(btn => {
+    const hole = btn.querySelector('.peephole');
+    const btnRect = btn.getBoundingClientRect();
+    const offsetX = btnRect.left - stageRect.left;
+    const offsetY = btnRect.top - stageRect.top;
+    hole.style.backgroundImage = "url('bouquet.png')";
+    hole.style.backgroundSize = stageRect.width + 'px ' + stageRect.height + 'px';
+    hole.style.backgroundPosition = (-offsetX) + 'px ' + (-offsetY) + 'px';
+  });
+}
+window.addEventListener('resize', () => requestAnimationFrame(alignPeepholes));
+
+function updateHint(){
+  const remaining = 5 - opened.size;
+  if(remaining > 0){
+    hintText.textContent = remaining === 1 ? "1 rosa blanca por descubrir" : `${remaining} rosas blancas por descubrir`;
+    hintText.classList.remove('pink-ready');
+  } else {
+    hintText.textContent = "La rosa rosada está lista para ti ✨";
+    hintText.classList.add('pink-ready');
+  }
+}
+
+function openCard(message, isPink, btn){
+  lastFocused = document.activeElement;
+  cardMessage.textContent = message;
+  cardTag.textContent = isPink ? "La rosa rosada" : "Rosa blanca";
+  card.classList.toggle('pink-card', isPink);
+  overlay.classList.add('show');
+  closeBtn.focus();
+  if(isPink){ spawnPetals(); }
+  activeHotspot = btn;
+  requestAnimationFrame(() => btn.classList.add('lifted'));
+}
+
+function closeCard(){
+  overlay.classList.remove('show');
+  if(activeHotspot){ activeHotspot.classList.remove('lifted'); activeHotspot = null; }
+  if(lastFocused) lastFocused.focus();
+}
+
+whiteButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const i = parseInt(btn.dataset.index, 10);
+    if(!opened.has(i)){
+      opened.add(i);
+      btn.classList.add('opened');
+      dots[i].classList.add('filled');
+      updateHint();
+      if(opened.size === 5){
+        pinkBtn.classList.remove('locked');
+        pinkBtn.classList.add('ready');
       }
-      openCard(whiteMessages[i], false, btn);
-    });
-  });
-
-  pinkBtn.addEventListener('click', () => {
-    if(opened.size < 5){
-      pinkBtn.classList.add('shake');
-      hintText.textContent = "Descubre primero las 5 rosas blancas 🤍";
-      setTimeout(() => pinkBtn.classList.remove('shake'), 450);
-      setTimeout(updateHint, 1600);
-      return;
     }
-    openCard(pinkMessage, true, pinkBtn);
+    openCard(whiteMessages[i], false, btn);
   });
+});
 
-  closeBtn.addEventListener('click', closeCard);
-  overlay.addEventListener('click', (e) => {
-    if(e.target === overlay) closeCard();
-  });
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeCard();
-  });
-
-  function spawnPetals(){
-    const stage = card;
-    for(let p = 0; p < 10; p++){
-      const petal = document.createElement('span');
-      petal.className = 'petal';
-      petal.style.left = (10 + Math.random() * 80) + '%';
-      petal.style.animationDuration = (1.6 + Math.random()*1.2) + 's';
-      petal.style.animationDelay = (Math.random()*0.4) + 's';
-      stage.appendChild(petal);
-      setTimeout(() => petal.remove(), 3200);
-    }
+pinkBtn.addEventListener('click', () => {
+  if(opened.size < 5){
+    pinkBtn.classList.add('shake');
+    hintText.textContent = "Descubre primero las 5 rosas blancas 🤍";
+    setTimeout(() => pinkBtn.classList.remove('shake'), 450);
+    setTimeout(updateHint, 1600);
+    return;
   }
+  openCard(pinkMessage, true, pinkBtn);
+});
 
-  updateHint();
+closeBtn.addEventListener('click', closeCard);
+overlay.addEventListener('click', (e) => { if(e.target === overlay) closeCard(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && overlay.classList.contains('show')) closeCard(); });
+
+function spawnPetals(){
+  for(let p = 0; p < 10; p++){
+    const petal = document.createElement('span');
+    petal.className = 'petal';
+    petal.style.left = (10 + Math.random() * 80) + '%';
+    petal.style.animationDuration = (1.6 + Math.random()*1.2) + 's';
+    petal.style.animationDelay = (Math.random()*0.4) + 's';
+    card.appendChild(petal);
+    setTimeout(() => petal.remove(), 3200);
+  }
+}
+
+updateHint();
 </script>
 
 </body>
