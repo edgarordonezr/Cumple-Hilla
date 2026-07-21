@@ -119,8 +119,9 @@
     padding:8px 10px;
   }
   .btn[disabled]{ opacity:.55; cursor:default; }
-  .btn.hidden-btn{ opacity:0; pointer-events:none; transform:translateY(6px); }
-  .btn.show-btn{ opacity:1; pointer-events:auto; transform:translateY(0); }
+  .btn.hidden-btn, .algo-mas-wrap.hidden-btn{ opacity:0; pointer-events:none; transform:translateY(6px); }
+  .btn.show-btn, .algo-mas-wrap.show-btn{ opacity:1; pointer-events:auto; transform:translateY(0); }
+  .algo-mas-wrap{ transition:opacity .4s ease, transform .4s ease; }
 
   .skip-link{
     position:fixed;
@@ -451,6 +452,78 @@
   }
   @keyframes fall{ to{ transform:translateY(420px) rotate(340deg); opacity:0; } }
 
+  .algo-mas-wrap{
+    margin-top:26px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .algo-mas-btn{
+    font-size:17px;
+    font-weight:700;
+    padding:15px 34px;
+    background:var(--coral);
+    color:#fff;
+    box-shadow:0 10px 24px -10px rgba(213,100,92,0.55);
+    animation: algoMasPulse 2.4s ease-in-out infinite;
+  }
+  .algo-mas-btn:hover{ transform:translateY(-2px); }
+  @keyframes algoMasPulse{
+    0%,100%{ transform:scale(1); box-shadow:0 10px 24px -10px rgba(213,100,92,0.55); }
+    50%{ transform:scale(1.045); box-shadow:0 12px 28px -8px rgba(213,100,92,0.7); }
+  }
+  .algo-mas-sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    opacity:.85;
+  }
+
+  /* ================= SCENE 5: VERSE ================= */
+  .verse-card{
+    max-width:440px;
+    text-align:center;
+    background:var(--paper);
+    border:1px solid rgba(140,127,203,0.22);
+    border-radius:24px;
+    padding:38px 32px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .verse-mark{
+    font-family:'Fraunces', serif;
+    font-size:52px;
+    color:var(--lavender-soft);
+    line-height:0;
+    display:block;
+    margin-bottom:6px;
+  }
+  .verse-card p.verse-text{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:20px;
+    line-height:1.6;
+    color:var(--ink);
+    margin:0 0 18px;
+  }
+  .verse-ref{
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:var(--coral-deep);
+  }
+  .verse-divider{
+    width:36px;
+    height:2px;
+    background:var(--lavender);
+    border:none;
+    border-radius:2px;
+    margin:0 auto 26px;
+    opacity:.6;
+  }
+
   footer{ margin-top:40px; font-size:12px; color:var(--ink-soft); opacity:.7; text-align:center; }
 
   @media (prefers-reduced-motion: reduce){
@@ -599,6 +672,23 @@
   </div>
 
   <p class="hint" id="hintText">5 rosas blancas por descubrir</p>
+  <div class="algo-mas-wrap hidden-btn" id="algoMasWrap">
+    <button class="btn algo-mas-btn" id="algoMasBtn">Algo más...</button>
+    <span class="algo-mas-sub">👆 da clic aquí</span>
+  </div>
+  <footer>hecho con cariño 🌿</footer>
+</div>
+
+<!-- ===================== SCENE 5: VERSE ===================== -->
+<div class="scene" id="scene-verse">
+  <div class="eyebrow">Algo más...</div>
+  <h2>Salmo 20:4</h2>
+  <hr class="verse-divider">
+  <div class="verse-card">
+    <span class="verse-mark">“</span>
+    <p class="verse-text">Que te conceda lo que tu corazón desea;<br>que haga que se cumplan todos tus planes.</p>
+    <span class="verse-ref">Salmo 20:4</span>
+  </div>
   <footer>hecho con cariño 🌿</footer>
 </div>
 
@@ -659,7 +749,8 @@ musicBtn.addEventListener('click', () => {
 const scenes = {
   intro: document.getElementById('scene-intro'),
   cake: document.getElementById('scene-cake'),
-  bouquet: document.getElementById('scene-bouquet')
+  bouquet: document.getElementById('scene-bouquet'),
+  verse: document.getElementById('scene-verse')
 };
 function goTo(name){
   Object.values(scenes).forEach(s => s.classList.remove('active'));
@@ -836,6 +927,10 @@ const hintText = document.getElementById('hintText');
 const dots = document.querySelectorAll('.progress .dot');
 let lastFocused = null;
 let activeHotspot = null;
+let pinkMessageOpened = false;
+let algoMasRevealed = false;
+const algoMasBtn = document.getElementById('algoMasBtn');
+const algoMasWrap = document.getElementById('algoMasWrap');
 
 function alignPeepholes(){
   const stageRect = stage.getBoundingClientRect();
@@ -870,7 +965,7 @@ function openCard(message, isPink, btn){
   card.classList.toggle('pink-card', isPink);
   overlay.classList.add('show');
   closeBtn.focus();
-  if(isPink){ spawnPetals(); }
+  if(isPink){ spawnPetals(); pinkMessageOpened = true; }
   activeHotspot = btn;
   requestAnimationFrame(() => btn.classList.add('lifted'));
 }
@@ -879,6 +974,10 @@ function closeCard(){
   overlay.classList.remove('show');
   if(activeHotspot){ activeHotspot.classList.remove('lifted'); activeHotspot = null; }
   if(lastFocused) lastFocused.focus();
+  if(pinkMessageOpened && !algoMasRevealed){
+    algoMasRevealed = true;
+    setTimeout(() => algoMasWrap.classList.add('show-btn'), 400);
+  }
 }
 
 whiteButtons.forEach(btn => {
@@ -924,6 +1023,7 @@ function spawnPetals(){
     setTimeout(() => petal.remove(), 3200);
   }
 }
+algoMasBtn.addEventListener('click', () => goTo('verse'));
 
 updateHint();
 </script>
