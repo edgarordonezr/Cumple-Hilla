@@ -117,7 +117,7 @@
 
   .hotspot{
     position:absolute;
-    width:15%;
+    width:17%;
     aspect-ratio:1/1;
     transform:translate(-50%,-50%);
     border:none;
@@ -132,6 +132,27 @@
     inset:0;
     border-radius:50%;
     box-shadow:0 0 0 2px rgba(255,255,255,0.0);
+  }
+
+  /* "Peephole": a live crop of the same bouquet image, pixel-aligned
+     over the flower, so it can be lifted/scaled to look like the
+     rose leaning forward without disturbing the rest of the artwork */
+  .peephole{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background-repeat:no-repeat;
+    -webkit-mask-image:radial-gradient(circle, #000 55%, transparent 78%);
+    mask-image:radial-gradient(circle, #000 55%, transparent 78%);
+    transform:translateY(0) scale(1);
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1), filter .5s ease;
+    filter:drop-shadow(0 0 0 rgba(0,0,0,0));
+    pointer-events:none;
+  }
+
+  .hotspot.lifted .peephole{
+    transform:translateY(-9%) scale(1.26) rotate(-2deg);
+    filter:drop-shadow(0 12px 16px rgba(62,54,44,0.35));
   }
 
   .hotspot .glow{
@@ -306,7 +327,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .hotspot .glow, .hotspot.pink.ready .glow, .petal{ animation:none !important; }
-    .card, .overlay{ transition:none !important; }
+    .card, .overlay, .peephole{ transition:none !important; }
   }
 </style>
 </head>
@@ -328,24 +349,30 @@
     <img src="bouquet.png" alt="Ramo de flores con rosas blancas, una rosa rosada y lavanda, envuelto en papel amarillo">
 
     <!-- White rose hotspots -->
-    <button class="hotspot white" data-index="0" style="left:47%; top:15.5%;" aria-label="Rosa blanca 1">
+    <button class="hotspot white" data-index="0" style="left:46.8%; top:16.5%;" aria-label="Rosa blanca 1">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
-    <button class="hotspot white" data-index="1" style="left:30%; top:41%;" aria-label="Rosa blanca 2">
+    <button class="hotspot white" data-index="1" style="left:34.4%; top:42.6%;" aria-label="Rosa blanca 2">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
-    <button class="hotspot white" data-index="2" style="left:49%; top:41%;" aria-label="Rosa blanca 3">
+    <button class="hotspot white" data-index="2" style="left:47%; top:37.3%;" aria-label="Rosa blanca 3">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
-    <button class="hotspot white" data-index="3" style="left:75%; top:39%;" aria-label="Rosa blanca 4">
+    <button class="hotspot white" data-index="3" style="left:57.6%; top:28.7%;" aria-label="Rosa blanca 4">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
-    <button class="hotspot white" data-index="4" style="left:83%; top:37%;" aria-label="Rosa blanca 5">
+    <button class="hotspot white" data-index="4" style="left:81.4%; top:37.5%;" aria-label="Rosa blanca 5">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
 
     <!-- Pink rose -->
-    <button class="hotspot pink locked" id="pinkBtn" style="left:64.5%; top:41%;" aria-label="Rosa rosada, el mensaje especial">
+    <button class="hotspot pink locked" id="pinkBtn" style="left:64.3%; top:40.7%;" aria-label="Rosa rosada, el mensaje especial">
+      <span class="peephole"></span>
       <span class="glow"></span>
     </button>
   </div>
@@ -375,6 +402,8 @@
   const pinkMessage = "Eres una persona que me hace querer ser mejor. Y no es solo eso — eres alguien que sé que nunca me voy a arrepentir de seguir conociendo. Me encanta que estés en mi vida y lo especial que la haces con solo estar en ella. Le agradezco a Dios haberme puesto en el camino a alguien que me ha cambiado para bien, y te lo agradezco a ti también.\n\nPor eso no quiero parar de conocerte.\n\nHoy solo te deseo mucha felicidad. Vive llena de bendiciones, porque cada cosa buena que te pase te la mereces por completo — y yo siempre, siempre me voy a alegrar por ti.";
 
   const opened = new Set();
+  const stage = document.getElementById('stage');
+  const allHotspots = document.querySelectorAll('.hotspot');
   const whiteButtons = document.querySelectorAll('.hotspot.white');
   const pinkBtn = document.getElementById('pinkBtn');
   const overlay = document.getElementById('overlay');
@@ -385,6 +414,28 @@
   const hintText = document.getElementById('hintText');
   const dots = document.querySelectorAll('.progress .dot');
   let lastFocused = null;
+  let activeHotspot = null;
+
+  // Align each "peephole" so it shows exactly the same pixels of the
+  // bouquet photo that sit behind it, so at rest it's invisible, and
+  // when lifted it looks like that same rose leaning forward.
+  function alignPeepholes(){
+    const stageRect = stage.getBoundingClientRect();
+    if(stageRect.width === 0) return;
+    allHotspots.forEach(btn => {
+      const hole = btn.querySelector('.peephole');
+      const btnRect = btn.getBoundingClientRect();
+      const offsetX = btnRect.left - stageRect.left;
+      const offsetY = btnRect.top - stageRect.top;
+      hole.style.backgroundImage = "url('bouquet.png')";
+      hole.style.backgroundSize = stageRect.width + 'px ' + stageRect.height + 'px';
+      hole.style.backgroundPosition = (-offsetX) + 'px ' + (-offsetY) + 'px';
+    });
+  }
+  window.addEventListener('load', alignPeepholes);
+  window.addEventListener('resize', () => requestAnimationFrame(alignPeepholes));
+  alignPeepholes();
+  setTimeout(alignPeepholes, 300); // safety pass after font/layout settle
 
   function updateHint(){
     const remaining = 5 - opened.size;
@@ -399,7 +450,7 @@
     }
   }
 
-  function openCard(message, isPink){
+  function openCard(message, isPink, btn){
     lastFocused = document.activeElement;
     cardMessage.textContent = message;
     cardTag.textContent = isPink ? "La rosa rosada" : "Rosa blanca";
@@ -407,10 +458,17 @@
     overlay.classList.add('show');
     closeBtn.focus();
     if(isPink){ spawnPetals(); }
+
+    activeHotspot = btn;
+    requestAnimationFrame(() => btn.classList.add('lifted'));
   }
 
   function closeCard(){
     overlay.classList.remove('show');
+    if(activeHotspot){
+      activeHotspot.classList.remove('lifted');
+      activeHotspot = null;
+    }
     if(lastFocused) lastFocused.focus();
   }
 
@@ -427,7 +485,7 @@
           pinkBtn.classList.add('ready');
         }
       }
-      openCard(whiteMessages[i], false);
+      openCard(whiteMessages[i], false, btn);
     });
   });
 
@@ -439,7 +497,7 @@
       setTimeout(updateHint, 1600);
       return;
     }
-    openCard(pinkMessage, true);
+    openCard(pinkMessage, true, pinkBtn);
   });
 
   closeBtn.addEventListener('click', closeCard);
