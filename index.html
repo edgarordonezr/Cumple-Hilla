@@ -837,8 +837,8 @@ const candle5 = document.getElementById('candle5');
 const allCandles = [candle1, candle2, candle3, candle4, candle5];
 
 let audioCtx = null, analyser = null, dataArray = null, listening = false, blowProgress = 0;
-const BLOW_THRESHOLD = 0.14;
-const BLOW_NEEDED = 550;
+const BLOW_THRESHOLD = 0.08;
+const BLOW_NEEDED = 400;
 
 async function startListening(){
   micBtn.disabled = true;
@@ -871,7 +871,7 @@ function monitorBlow(){
     sum += v*v;
   }
   const rms = Math.sqrt(sum/dataArray.length);
-  meterFill.style.width = Math.min(100, rms*420) + '%';
+  meterFill.style.width = Math.min(100, rms*700) + '%';
 
   if(rms > BLOW_THRESHOLD){ blowProgress += 16; }
   else { blowProgress = Math.max(0, blowProgress - 10); }
