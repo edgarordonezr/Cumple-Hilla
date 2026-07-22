@@ -44,6 +44,7 @@
     flex-direction:column;
     align-items:center;
     min-height:100vh;
+    min-height:100dvh;
   }
 
   /* ---------- Scene management ---------- */
@@ -54,6 +55,7 @@
     align-items:center;
     padding:48px 20px 80px;
     min-height:100vh;
+    min-height:100dvh;
     justify-content:center;
   }
   .scene.active{
@@ -538,7 +540,7 @@
 
 <button class="skip-link" id="skipBtn">Saltar intro →</button>
 <button class="music-btn" id="musicBtn" aria-label="Activar o silenciar música" title="Música">🔇</button>
-<audio id="bgMusic" src="song.mp3" loop preload="auto"></audio>
+<audio id="bgMusic" src="song.mp3" loop preload="none"></audio>
 
 <!-- ===================== SCENE 1: INTRO ===================== -->
 <div class="scene active" id="scene-intro">
