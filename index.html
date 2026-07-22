@@ -412,6 +412,8 @@
     opacity:0; pointer-events:none;
     transition:opacity .35s ease;
     z-index:80;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
   }
   .overlay.show{ opacity:1; pointer-events:auto; }
   .card{
@@ -425,6 +427,10 @@
     opacity:0;
     transition:transform .4s cubic-bezier(.2,.8,.2,1), opacity .4s ease;
     text-align:center;
+    max-height:calc(100dvh - 48px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    margin:auto;
   }
   .overlay.show .card{ transform:translateY(0) scale(1); opacity:1; }
   .card.pink-card{ background: linear-gradient(180deg, #FFF6F2 0%, var(--paper) 55%); border:1px solid rgba(232,131,125,0.25); }
@@ -443,6 +449,8 @@
     font-family:'Quicksand', sans-serif; font-weight:600; font-size:14px;
     padding:11px 26px; border-radius:999px; cursor:pointer;
     transition:transform .2s ease, background .2s ease;
+    position:sticky;
+    bottom:0;
   }
   .card .close-btn:hover{ transform:translateY(-1px); }
   .pink-card .close-btn{ background:var(--coral); }
@@ -453,6 +461,24 @@
     opacity:.85; animation: fall linear forwards;
   }
   @keyframes fall{ to{ transform:translateY(420px) rotate(340deg); opacity:0; } }
+
+  @media (max-width: 420px){
+    .overlay{ padding:16px 14px; align-items:flex-start; }
+    .card{
+      padding:28px 20px 22px;
+      max-height:calc(100dvh - 32px);
+      border-radius:22px;
+    }
+    .card p.message{ font-size:16.5px; line-height:1.5; }
+    .pink-card p.message{ font-size:17px; }
+    .card .tag{ margin-bottom:10px; }
+    .card .close-btn{ margin-top:18px; padding:10px 22px; }
+  }
+
+  @media (max-height: 650px){
+    .overlay{ align-items:flex-start; padding-top:16px; }
+    .card{ max-height:calc(100dvh - 32px); padding-top:26px; }
+  }
 
   .algo-mas-wrap{
     margin-top:26px;
@@ -968,6 +994,7 @@ function openCard(message, isPink, btn){
   cardTag.textContent = isPink ? "La rosa rosada" : "Rosa blanca";
   card.classList.toggle('pink-card', isPink);
   overlay.classList.add('show');
+  card.scrollTop = 0;
   closeBtn.focus();
   if(isPink){ spawnPetals(); pinkMessageOpened = true; }
   activeHotspot = btn;
