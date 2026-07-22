@@ -218,7 +218,7 @@
     animation: flicker 1.6s ease-in-out infinite;
     transition: opacity .3s ease;
   }
-  .flame:nth-child(2){ animation-delay:.2s; }
+  .flame:nth-of-type(2){ animation-delay:.2s; }
   @keyframes flicker{
     0%,100%{ transform:scale(1) rotate(0deg); }
     30%{ transform:scale(1.06,0.95) rotate(-3deg); }
@@ -529,6 +529,8 @@
   @media (prefers-reduced-motion: reduce){
     .hotspot .glow, .hotspot.pink.ready .glow, .petal, .flame, .scene.active{ animation:none !important; }
     .card, .overlay, .peephole{ transition:none !important; }
+    .candle-group.out .flame{ opacity:0 !important; }
+    .candle-group.out .smoke{ opacity:0 !important; }
   }
 </style>
 </head>
